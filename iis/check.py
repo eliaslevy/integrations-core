@@ -61,7 +61,7 @@ class IIS(PDHBaseCheck):
 
     def check(self, instance):
 
-        sites = instance.get('sites', ['_Total'])
+        sites = instance.get('sites')
         key = hash_mutable(instance)
         for inst_name, dd_name, metric_func, counter in self._metrics[key]:
             try:
@@ -73,7 +73,9 @@ class IIS(PDHBaseCheck):
 
                     if not counter.is_single_instance():
                         # Skip any sites we don't specifically want.
-                        if sitename not in sites:
+                        if not sites:
+                            tags.append("site:{0}".format(self.normalize(sitename)))
+                        elif sitename not in sites:
                             continue
                         elif sitename != "_Total":
                             tags.append("site:{0}".format(self.normalize(sitename)))
